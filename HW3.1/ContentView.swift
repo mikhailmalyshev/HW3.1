@@ -11,62 +11,41 @@ enum CurrentLight {
     case red, yellow, green
 }
 
-let lightOn = 1.0
-let lightOff = 0.3
-
 struct ContentView: View {
     
-    @State private var textOnButton = "START"
+    @State private var buttonTitle = "START"
     @State private var currentLight = CurrentLight.red
-    @State private var redLight = lightOff
-    @State private var yellowLight = lightOff
-    @State private var greenLight = lightOff
     
-    var body: some View {
-        VStack {
-            VStack(spacing: 20.0) {
-                ColorCircle(color: .red, oppacity: redLight)
-                ColorCircle(color: .yellow, oppacity: yellowLight)
-                ColorCircle(color: .green, oppacity: greenLight)
-            }
-            Spacer()
-            Button(action: { startButtonPressed() }) {
-                Text("\(textOnButton)")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .fixedSize()
-                    .frame(width: 100, height: 20)
-                    .padding(20)
-                    .background(Color.blue)
-                    .cornerRadius(30)
-                    .foregroundColor(.white)
-                    .padding(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 35)
-                            .stroke(Color.blue, lineWidth: 5)
-                    )
-            }
-            Spacer()
+    private func nextColor() {
+        switch currentLight {
+        case .red: currentLight = .yellow
+        case .yellow: currentLight = .green
+        case .green: currentLight = .red
         }
     }
-    
-    private func startButtonPressed() {
-        
-        textOnButton = "NEXT"
-        
-        switch currentLight {
-        case .red:
-            redLight = lightOn
-            greenLight = lightOff
-            currentLight = .yellow
-        case .yellow:
-            yellowLight = lightOn
-            redLight = lightOff
-            currentLight = .green
-        case .green:
-            greenLight = lightOn
-            yellowLight = lightOff
-            currentLight = .red
+}
+
+extension ContentView {
+    var body: some View {
+        ZStack {
+            Color(.black)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 20) {
+                ColorLight(color: .red, opacity: currentLight == .red ? 1 : 0.3)
+                ColorLight(color: .yellow, opacity: currentLight == .yellow ? 1 : 0.3)
+                ColorLight(color: .green, opacity: currentLight == .green ? 1 : 0.3)
+                
+                Spacer()
+                
+                ChangeColorButton(title: buttonTitle) {
+                    if buttonTitle == "START" {
+                        buttonTitle = "NEXT"
+                    }
+                    nextColor()
+                }
+            }
+            .padding()
         }
     }
 }
